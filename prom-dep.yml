@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prom-deploy
+spec:
+  replicas: 1
+  selector:
+    matchExpressions:
+    - { key: name, operator: In, values: [ prometheus ]}
+  template:
+    metadata:
+      name: prom-pod
+      labels:
+        name: prometheus
+    spec:
+      containers:
+      - name: prom-con
+        image: vimal13/prometheus
+        volumeMounts:
+         - mountPath: /etc/prometheus/
+           name: mount1
+         - mountPath: /prometheus/
+           name: mount2
+
+      volumes:
+       - name: mount1
+         configMap:
+           name: prom-config-map
+       - name: mount2
+         persistentVolumeClaim:
+           claimName: prom-pvc
